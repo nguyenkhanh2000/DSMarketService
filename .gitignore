@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.secret.json
+.DS_Store

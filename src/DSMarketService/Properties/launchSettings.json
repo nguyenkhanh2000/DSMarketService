@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "DSMarketService": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:62895;http://localhost:62896"
+    }
+  }
+}

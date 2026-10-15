@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dsmarketservice-config
+data:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  DOTNET_ENVIRONMENT: "Development"
+  AllowConsoleLog: "true"
+  Diagnostics__ApiInfoLogging__Enabled: "true"
+  Diagnostics__ApiInfoLogging__MaxParameters: "32"
+  Diagnostics__ApiInfoLogging__MaxParameterValueLength: "256"
+  Diagnostics__ApiInfoLogging__MaxInputParamsLength: "4096"
+  KafkaLogger__AppName: "DSMarketService"
+  KafkaLogger__Targets__Target1__Topic: "DSmarketService-Development"
+  Market__TimeZoneId: "Asia/Ho_Chi_Minh"
+  Network__Enabled: "true"
+  Redis__Db3: "1"

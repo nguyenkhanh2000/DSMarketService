@@ -1,0 +1,31 @@
+// Các namespace được sử dụng lặp lại trong API, Controller, Feature và Middleware.
+// Global using chỉ có hiệu lực trong project DSMarketService (không tràn sang Contracts/Infrastructure).
+global using System;
+global using System.Diagnostics;
+global using System.Globalization;
+global using System.Collections.Generic;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using DSMarketService.Contracts;
+global using DSMarketService.Features;
+global using DSMarketService.Extensions;
+global using DSMarketService.Settings;
+global using DSMarketService.Infrastructure.Database;
+global using DSMarketService.Infrastructure.Networking;
+global using DSMarketService.Infrastructure.Redis;
+global using DSMarketService.Middleware;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Routing;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Primitives;
+global using Newtonsoft.Json;
+global using Newtonsoft.Json.Linq;
+global using StackExchange.Redis;
+global using Dapper;
+global using System.Data;
+global using System.Security.Cryptography;
+global using System.Text;

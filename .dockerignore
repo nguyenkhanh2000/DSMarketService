@@ -1,0 +1,16 @@
+# Build context only needs source, local NuGet and NuGet.Config.
+**/bin
+**/obj
+.git
+.vs
+.idea
+.github
+tests
+tools
+*.user
+*.suo
+*.secret.json
+*.zip
+*.rar
+coverage
+publish
