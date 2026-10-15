@@ -22,15 +22,37 @@ public sealed class MarketExceptionMiddleware(RequestDelegate next, ILogger<Mark
             // Middleware API_COMPLETED đọc cờ này để phân biệt lỗi nghiệp vụ dù HTTP 200.
             context.Items[ApiCompletionLoggingMiddleware.ExceptionHandledKey] = true;
             // Log tên lỗi và đường dẫn, không đẩy connection string hoặc dữ liệu giá lên Kafka.
+
             try
             {
-                logger.LogError("Market endpoint error {Path} {ExceptionType}",
-                    context.Request.Path, ex.GetType().Name);
+                var request = context.Request;
+
+                var inputParams = RequestLogFormatter.Format(
+                    request,
+                    maxParameters: 32,
+                    maxValueLength: 256,
+                    maxTotalLength: 4096);
+
+                var bodyLength = RequestLogFormatter.GetRequestBodyLength(request);
+
+                logger.LogError(
+                    "API_ERROR Api={Api} Method={Method} " +
+                    "InputParams={InputParams} " +
+                    "BodyLength={BodyLength} " +
+                    "ExceptionType={ExceptionType} " +
+                    "TraceId={TraceId}",
+                    request.Path.Value,
+                    request.Method,
+                    inputParams,
+                    bodyLength,
+                    ex.GetType().Name,
+                    context.TraceIdentifier);
             }
             catch (Exception)
             {
-                // Không để exception từ logger che khuất lỗi nghiệp vụ.
+                // Không để lỗi ghi log ảnh hưởng response API.
             }
+
             if (context.Response.HasStarted)
                 throw; // Không được ghi JSON mới khi response đã bắt đầu truyền.
 

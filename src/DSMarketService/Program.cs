@@ -33,7 +33,16 @@ app.MapGet("/", () => Results.Text("DSMarketService .NET 10"));
 app.MapGet("/health/live", () => Results.Ok(new { status = "live" }));
 app.MapGet("/health/ready", (RedisConnections redis) =>
     redis.IsReady ? (IResult)Results.Ok(new { status = "ready" }) : Results.StatusCode(503));
+
 app.MapControllers();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/__debug/exception", () =>
+    {
+        throw new InvalidOperationException("TEST: Exception from DSMarketService");
+    });
+}
 
 // EnsureNetwork kiểm tra CẢ Sentinel lẫn Redis thường trước khi kết nối.
 await NetworkBootstrap.EnsureNetworkAsync(app.Configuration, app.Logger);
