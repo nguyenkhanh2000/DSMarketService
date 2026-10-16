@@ -12,7 +12,7 @@ public sealed class MarketPricesController(MarketReadService read, MarketKeyReso
     public async Task<IActionResult> PriceLadder()
     {
         var from = QDouble("from", 0);
-        var to = QDouble("to", -1);
+        var to   = QDouble("to", -1);
         return LegacyJson(await read.ReadSeriesAsync(RedisSource.Sentinel, keys.Db1,
             "PRICE_LADDER:" + Q("Code").Trim().ToUpperInvariant(),
             from, to, true, from == 0 && to == -1, ClientToken, floatingScore: true));
@@ -22,7 +22,7 @@ public sealed class MarketPricesController(MarketReadService read, MarketKeyReso
     public async Task<IActionResult> PutThrough()
     {
         var from = QLong("from", 0);
-        var to = QLong("to", -1);
+        var to   = QLong("to", -1);
         return LegacyJson(await read.ReadSeriesAsync(RedisSource.Legacy, keys.Db0, Q("keyName").Trim().ToUpperInvariant(),
             from, to, true, from == 0 && to == -1, ClientToken));
     }
