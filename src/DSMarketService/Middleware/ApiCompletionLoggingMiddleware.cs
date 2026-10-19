@@ -97,17 +97,31 @@ public sealed class ApiCompletionLoggingMiddleware(
                         && countValue is long count
                             ? count
                             : -1L;
-                    logger.LogInformation(CompletedEvent,
-                        "API_COMPLETED URL={URL} Method={Method} Host={Host} TypeLog={TypeLog} " +
-                        "IPServer={IPServer} IPClient={IPClient} Module={Module} " +
-                        "Input={Input} Output={Output} " +
-                        "Api={Api} StatusCode={StatusCode} DurationMs={DurationMs} " +
-                        "Outcome={Outcome} InputParams={InputParams} " +
-                        "BodyLength={BodyLength} ResponseBodyLength={ResponseBodyLength} TraceId={TraceId}",
-                        url, request.Method, host, "API", ipServer, ipClient,
-                        RequestLogMetadata.SafeText(_module, 128), inputParams, outputLength,
-                        api, statusCode, (long)Math.Round(elapsedMs), outcome,
-                        inputParams, bodyLength, responseBodyLength, context.TraceIdentifier);
+
+                    // Trình định dạng Manonero sử dụng giao thức \0Key=Value\0 để
+                    // đưa các trường từ thông điệp đã định dạng lên cấp cao nhất của cấu trúc JSON trong Kafka.
+                    // Không sử dụng BeginScope hoặc các phần giữ chỗ {URL} không được hỗ trợ trong Target.Template.
+                    var fields = LogFieldExtensions.BuildFieldSuffix(
+                        ("URL", url),
+                        ("Method", request.Method),
+                        ("Host", host),
+                        ("TypeLog", "API"),
+                        ("IPServer", ipServer),
+                        ("IPClient", ipClient),
+                        ("Module", RequestLogMetadata.SafeText(_module, 128)),
+                        ("Input", inputParams),
+                        ("Output", outputLength),
+                        ("Api", api),
+                        ("StatusCode", statusCode),
+                        ("DurationMs", (long)Math.Round(elapsedMs)),
+                        ("Outcome", outcome),
+                        ("InputParams", inputParams),
+                        ("BodyLength", bodyLength),
+                        ("ResponseBodyLength", responseBodyLength),
+                        ("TraceId", context.TraceIdentifier));
+
+                    // Message remains API_COMPLETED; metadata is extracted into JSON fields.
+                    logger.LogInformation(CompletedEvent, "{Fields}", fields);
                 }
                 catch (Exception)
                 {
