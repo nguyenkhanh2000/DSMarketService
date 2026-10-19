@@ -54,35 +54,8 @@ public sealed class MarketReadService(RedisReader redis, MarketKeyResolver keys)
         }
         return ApiEnvelope.Ok(output);
     }
-    public async Task<ApiEnvelope> LastIndexAsync(string exchange, CancellationToken ct)
-    {
-        var key = "S5G_LAST_INDEX_" + exchange.Trim().ToUpperInvariant();
-        var raw = await redis.StringAsync(RedisSource.Legacy, keys.Db0, key, ct);
-        var token = RedisReader.Decode(raw);
-        return ToLastIndexResponse(token);
-    }
     /// <summary>
-    /// Pure mapping để kiểm thử response mà không cần kết nối Redis/Kafka.
-    /// Null khi key chưa có dữ liệu; không tự giả lập số liệu ngày mới.
-    /// </summary>
-    public static ApiEnvelope ToLastIndexResponse(JToken? stored)
-    {
-        JToken? data = stored switch
-        {
-            JObject obj => obj["Data"],
-            JArray array => array,
-            null => null,
-            _ => throw new JsonSerializationException("last_index: unexpected Redis JSON shape")
-        };
-
-        // Không trả nhầm object {Time, Data} dưới Data và cũng không báo success sai schema.
-        if (data is not null && data is not JArray)
-            throw new JsonSerializationException("last_index: Redis field Data must be a JSON array");
-
-        return ApiEnvelope.Ok(data);
-    }
-    /// <summary>
-    /// test ko trả theo ApiEnvelope
+    /// ko trả theo ApiEnvelope
     /// </summary>
     /// <param name="exchange"></param>
     /// <param name="ct"></param>
