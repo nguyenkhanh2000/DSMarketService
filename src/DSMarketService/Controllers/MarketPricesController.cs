@@ -36,5 +36,5 @@ public sealed class MarketPricesController(MarketReadService read, MarketKeyReso
         Q("symbol"), Q("from"), Q("to"), Q("resolution", "1"), QInt("countback", 0), ClientToken));
 
     [HttpGet("last_index")]
-    public async Task<IActionResult> LastIndex() => LegacyRaw(await read.LastIndexRawAsync(Exchange, ClientToken));
+    public async Task<IActionResult> LastIndex() => LegacyJson(await read.LastIndexAsync(Exchange, ClientToken));
 }
