@@ -3,15 +3,32 @@ kind: ConfigMap
 metadata:
   name: dsmarketservice-config
 data:
-  ASPNETCORE_ENVIRONMENT: "Production"
-  DOTNET_ENVIRONMENT: "Production"
-  AllowConsoleLog: "true"
-  Diagnostics__ApiInfoLogging__Enabled: "true"
-  Diagnostics__ApiInfoLogging__MaxParameters: "32"
-  Diagnostics__ApiInfoLogging__MaxParameterValueLength: "256"
-  Diagnostics__ApiInfoLogging__MaxInputParamsLength: "4096"
-  KafkaLogger__AppName: "DSMarketService"
-  KafkaLogger__Targets__Target1__Topic: "DSmarketService"
-  Market__TimeZoneId: "Asia/Ho_Chi_Minh"
-  Network__Enabled: "true"
-  Redis__Db3: "1"
+  ASPNETCORE_ENVIRONMENT: Production
+  DOTNET_ENVIRONMENT: Production
+  ASPNETCORE_HTTP_PORTS: '8080'
+  AllowConsoleLog: 'true'
+  Logging__LogLevel__Default: Information
+  Logging__LogLevel__Microsoft: Warning
+  Logging__LogLevel__System: Warning
+  Logging__LogLevel__DSMarketService.Middleware.ApiCompletionLoggingMiddleware: Information
+  Diagnostics__ApiInfoLogging__Enabled: 'true'
+  Diagnostics__ApiInfoLogging__MaxParameters: '32'
+  Diagnostics__ApiInfoLogging__MaxParameterValueLength: '256'
+  Diagnostics__ApiInfoLogging__MaxInputParamsLength: '4096'
+  KafkaLogger__AppName: DSMarketService
+  KafkaLogger__Targets__Target1__Template: '{''DateTime'':''{date:format=dd-MM-yyyy HH:mm:ss.fff}'',''Service'':''{appName}'',''MachineHost'':''{hostName}'',''IP'':''{iPv4s[0]}'',''Level'':''{level:uppercase=true:truncate=short}'',''Logger'':''{logger}'',''Message'':''{message}''}'
+  KafkaLogger__Targets__Target1__Topic: DSmarketService
+  KafkaLogger__Targets__Target1__AllowFieldsFromMessage: 'true'
+  KafkaLogger__Targets__Target1__AutoRemoveFieldsFromMessage: 'true'
+  KafkaLogger__Rules__0__WriteTo: Target1
+  KafkaLogger__BootstrapServers: 172.16.0.124:9092,172.16.0.125:9092,172.16.0.126:9092
+  Redis__RedisSentinel: 172.16.0.111:26379,172.16.0.112:26379,172.16.0.113:26379,ServiceName=rdmaster,abortConnect=false,connectTimeout=3000,syncTimeout=3000,connectRetry=3
+  Redis__RedisLegacy: 172.16.0.250:6379,abortConnect=false,connectTimeout=3000,syncTimeout=3000,connectRetry=3
+  Redis__SentinelServiceName: ''
+  Redis__Db0: '0'
+  Redis__Db1: '1'
+  Market__TimeZoneId: Asia/Ho_Chi_Minh
+  Network__Enabled: 'true'
+  Network__FailFast: 'false'
+  SQL__CommandTimeoutSeconds: '8'
+  Oracle__CommandTimeoutSeconds: '8'

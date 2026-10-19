@@ -3,15 +3,32 @@ kind: ConfigMap
 metadata:
   name: dsmarketservice-config
 data:
-  ASPNETCORE_ENVIRONMENT: "UAT"
-  DOTNET_ENVIRONMENT: "UAT"
-  AllowConsoleLog: "true"
-  Diagnostics__ApiInfoLogging__Enabled: "true"
-  Diagnostics__ApiInfoLogging__MaxParameters: "32"
-  Diagnostics__ApiInfoLogging__MaxParameterValueLength: "256"
-  Diagnostics__ApiInfoLogging__MaxInputParamsLength: "4096"
-  KafkaLogger__AppName: "DSMarketService"
-  KafkaLogger__Targets__Target1__Topic: "DSmarketService-UAT"
-  Market__TimeZoneId: "Asia/Ho_Chi_Minh"
-  Network__Enabled: "true"
-  Redis__Db3: "1"
+  ASPNETCORE_ENVIRONMENT: UAT
+  DOTNET_ENVIRONMENT: UAT
+  ASPNETCORE_HTTP_PORTS: '8080'
+  AllowConsoleLog: 'true'
+  Logging__LogLevel__Default: Information
+  Logging__LogLevel__Microsoft: Warning
+  Logging__LogLevel__System: Warning
+  Logging__LogLevel__DSMarketService.Middleware.ApiCompletionLoggingMiddleware: Information
+  Diagnostics__ApiInfoLogging__Enabled: 'true'
+  Diagnostics__ApiInfoLogging__MaxParameters: '32'
+  Diagnostics__ApiInfoLogging__MaxParameterValueLength: '256'
+  Diagnostics__ApiInfoLogging__MaxInputParamsLength: '4096'
+  KafkaLogger__AppName: DSMarketService
+  KafkaLogger__Targets__Target1__Template: '{''DateTime'':''{date:format=dd-MM-yyyy HH:mm:ss.fff}'',''Service'':''{appName}'',''MachineHost'':''{hostName}'',''IP'':''{iPv4s[0]}'',''Level'':''{level:uppercase=true:truncate=short}'',''Logger'':''{logger}'',''Message'':''{message}''}'
+  KafkaLogger__Targets__Target1__Topic: DSmarketService-UAT
+  KafkaLogger__Targets__Target1__AllowFieldsFromMessage: 'true'
+  KafkaLogger__Targets__Target1__AutoRemoveFieldsFromMessage: 'true'
+  KafkaLogger__Rules__0__WriteTo: Target1
+  KafkaLogger__BootstrapServers: 10.26.7.104:9092,10.26.7.105:9092,10.26.7.106:9092
+  Redis__RedisSentinel: 172.16.0.121:26379, 172.16.0.122:26379, 172.16.0.123:26379
+  Redis__RedisLegacy: 10.26.7.84:6379
+  Redis__SentinelServiceName: ''
+  Redis__Db0: '0'
+  Redis__Db1: '1'
+  Market__TimeZoneId: Asia/Ho_Chi_Minh
+  Network__Enabled: 'true'
+  Network__FailFast: 'false'
+  SQL__CommandTimeoutSeconds: '8'
+  Oracle__CommandTimeoutSeconds: '8'

@@ -1,12 +1,20 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.11.12306.390 stable
+VisualStudioVersion = 18.11.12306.390
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSMarketService.Contracts", "src\DSMarketService.Contracts\DSMarketService.Contracts.csproj", "{6C589935-AB7E-4FF8-91B3-30292E6D10EA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSMarketService.Infrastructure", "src\DSMarketService.Infrastructure\DSMarketService.Infrastructure.csproj", "{391688D7-2034-4E8A-A4C7-DB91B9A8FAF0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSMarketService", "src\DSMarketService\DSMarketService.csproj", "{72D54D7B-1465-4181-A3EA-91D85D7784BA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{29AE0EDF-C021-4A82-8381-78CF7EF4625C}"
+	ProjectSection(SolutionItems) = preProject
+		deploy\configmap-development.yaml = deploy\configmap-development.yaml
+		deploy\configmap-production.yaml = deploy\configmap-production.yaml
+		deploy\configmap-uat.yaml = deploy\configmap-uat.yaml
+		deploy\Dockerfile = deploy\Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,5 +37,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {953DFFD2-0DF5-44F5-B299-7B2F7AE594DA}
 	EndGlobalSection
 EndGlobal
