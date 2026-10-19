@@ -27,7 +27,7 @@ var app = builder.Build();
 // Routing trước middleware API_COMPLETED để lấy route template chính xác.
 app.UseRouting();
 app.UseMiddleware<ApiCompletionLoggingMiddleware>();
-app.UseMiddleware<SlowRequestMiddleware>();
+//app.UseMiddleware<SlowRequestMiddleware>();
 app.UseMiddleware<MarketExceptionMiddleware>();
 app.MapGet("/", () => Results.Text("DSMarketService .NET 10"));
 app.MapGet("/health/live", () => Results.Ok(new { status = "live" }));

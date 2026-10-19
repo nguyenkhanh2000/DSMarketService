@@ -37,9 +37,12 @@ public abstract class MarketControllerBase : ControllerBase
         if (value is ApiEnvelope { Code: not 0 })
             HttpContext.Items[ApiCompletionLoggingMiddleware.BusinessFailureKey] = true;
         var payload = JsonConvert.SerializeObject(value);
-        // Độ dài thực tế của JSON phản hồi theo UTF-8, không giữ thêm bản sao body.
+        // ResponseBodyLength = byte UTF-8; Output = Data.Count / Data.Length,
+        // KHÔNG giữ JSON body trong HttpContext.Items để ghi Kafka.
         HttpContext.Items[ApiCompletionLoggingMiddleware.ResponseBodyLengthKey] =
             (long)Encoding.UTF8.GetByteCount(payload);
+        HttpContext.Items[ApiCompletionLoggingMiddleware.OutputLengthKey] =
+            GetDataLengthForLog(value, payload.Length);
         return Content(payload, "text/plain; charset=utf-8");
     }
 
@@ -49,6 +52,28 @@ public abstract class MarketControllerBase : ControllerBase
         var payload = value ?? "";
         HttpContext.Items[ApiCompletionLoggingMiddleware.ResponseBodyLengthKey] =
             (long)Encoding.UTF8.GetByteCount(payload);
+        HttpContext.Items[ApiCompletionLoggingMiddleware.OutputLengthKey] = (long)payload.Length;
         return Content(payload, "text/plain; charset=utf-8");
+    }
+
+    /// <summary>
+    /// Với dữ liệu dạng array/list: số phần tử như List.Count ở DSMarket cũ.
+    /// Với string: số ký tự (Length). Với object không có Count: độ dài
+    /// JSON đã serialize; không serialize lại và không ghi nội dung vào Kafka.
+    /// </summary>
+    private static long GetDataLengthForLog(object? value, int serializedLength)
+    {
+        var data = value is ApiEnvelope envelope ? envelope.Data : value;
+        return data switch
+        {
+            null => 0L,
+            JArray array => array.Count,
+            Array array => array.LongLength,
+            System.Collections.ICollection list => list.Count,
+            JValue jsonString when jsonString.Type == JTokenType.String =>
+                (long)(jsonString.Value<string>()?.Length ?? 0),
+            string text => text.Length,
+            _ => serializedLength
+        };
     }
 }

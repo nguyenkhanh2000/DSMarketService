@@ -6,6 +6,8 @@ namespace DSMarketService.Middleware;
 /// BodyLength: Content-Length của REQUEST (byte), -1 nếu không xác định; không đọc body.
 /// ResponseBodyLength: byte UTF-8 đã serialize ở LegacyJson/LegacyRaw, hoặc Content-Length,
 /// -1 nếu không xác định. Không sao chép response body để đếm byte.
+/// Input: giống InputParams. Output: chỉ ghi Count (array/list) hoặc Length (string),
+/// không ghi nội dung JSON. ResponseBodyLength tiếp tục là số byte UTF-8.
 /// </summary>
 public sealed class ApiCompletionLoggingMiddleware(
     RequestDelegate next,
@@ -15,12 +17,15 @@ public sealed class ApiCompletionLoggingMiddleware(
     public static readonly object ExceptionHandledKey = new();
     public static readonly object BusinessFailureKey = new();
     public static readonly object ResponseBodyLengthKey = new();
+    // Output là số lượng phần tử (hoặc độ dài chuỗi), không phải JSON content.
+    public static readonly object OutputLengthKey = new();
     private static readonly EventId CompletedEvent = new(1001, "API_COMPLETED");
 
     private readonly bool _infoEnabled = config.GetValue("Diagnostics:ApiInfoLogging:Enabled", true);
     private readonly int _maxParams = Math.Clamp(config.GetValue("Diagnostics:ApiInfoLogging:MaxParameters", 32), 1, 128);
     private readonly int _maxParamValueLength = Math.Clamp(config.GetValue("Diagnostics:ApiInfoLogging:MaxParameterValueLength", 256), 1, 2048);
     private readonly int _maxParamsLength = Math.Clamp(config.GetValue("Diagnostics:ApiInfoLogging:MaxInputParamsLength", 4096), 128, 16384);
+    private readonly string _module = config["KafkaLogger:AppName"] ?? "DSMarketService";
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -79,9 +84,29 @@ public sealed class ApiCompletionLoggingMiddleware(
 
                 try
                 {
+                    // URL không chứa query raw: tham số được log ở Input có che secrets.
+                    var request = context.Request;
+                    var url = RequestLogMetadata.SafeText(
+                        request.PathBase.ToString() + request.Path.ToString(), 512);
+                    var host = RequestLogMetadata.SafeText(request.Host.Value, 256);
+                    var ipServer = context.Connection.LocalIpAddress?.ToString() ?? "-";
+                    var ipClient = context.Connection.RemoteIpAddress?.ToString() ?? "-";
+                    // Chỉ ghi giá trị số. Controller đặt OutputLengthKey từ Data.Count
+                    // hoặc string.Length; không lưu lại JSON body để ghi Kafka.
+                    var outputLength = context.Items.TryGetValue(OutputLengthKey, out var countValue)
+                        && countValue is long count
+                            ? count
+                            : -1L;
                     logger.LogInformation(CompletedEvent,
-                        "API_COMPLETED Api={Api} Method={Method} StatusCode={StatusCode} DurationMs={DurationMs} Outcome={Outcome} InputParams={InputParams} BodyLength={BodyLength} ResponseBodyLength={ResponseBodyLength} TraceId={TraceId}",
-                        api, context.Request.Method, statusCode, (long)Math.Round(elapsedMs), outcome,
+                        "API_COMPLETED URL={URL} Method={Method} Host={Host} TypeLog={TypeLog} " +
+                        "IPServer={IPServer} IPClient={IPClient} Module={Module} " +
+                        "Input={Input} Output={Output} " +
+                        "Api={Api} StatusCode={StatusCode} DurationMs={DurationMs} " +
+                        "Outcome={Outcome} InputParams={InputParams} " +
+                        "BodyLength={BodyLength} ResponseBodyLength={ResponseBodyLength} TraceId={TraceId}",
+                        url, request.Method, host, "API", ipServer, ipClient,
+                        RequestLogMetadata.SafeText(_module, 128), inputParams, outputLength,
+                        api, statusCode, (long)Math.Round(elapsedMs), outcome,
                         inputParams, bodyLength, responseBodyLength, context.TraceIdentifier);
                 }
                 catch (Exception)
